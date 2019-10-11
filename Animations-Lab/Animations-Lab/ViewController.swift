@@ -77,7 +77,7 @@ class ViewController: UIViewController {
     
     lazy var animationTimeLabel: UILabel = {
         let label = UILabel()
-        label.text = "AT: \(animationTimeStepper.value)"
+        label.text = "Time: \(animationTimeStepper.value)"
         label.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
         return label
     }()
@@ -86,8 +86,8 @@ class ViewController: UIViewController {
         let stepper = UIStepper()
         stepper.maximumValue = 5.0
         stepper.minimumValue = 0.25
-        
         stepper.stepValue = 0.25
+        stepper.value = 1.0
         stepper.addTarget(self, action: #selector(animationTimeStepperValueChanged(sender:)), for: .valueChanged)
         return stepper
     }()
@@ -101,9 +101,47 @@ class ViewController: UIViewController {
         return buttonStack
     }()
     
+    lazy var distanceLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Dist: \(distanceStepper.value)"
+        label.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+        return label
+    }()
+    
+    lazy var distanceStepper: UIStepper = {
+        let stepper = UIStepper()
+        stepper.maximumValue = 200
+        stepper.minimumValue = 50
+        stepper.stepValue = 10
+        stepper.value = 100
+        stepper.addTarget(self, action: #selector(distanceStepperValueChanged(sender:)), for: .valueChanged)
+        return stepper
+    }()
+    
+    lazy var distanceStackView: UIStackView = {
+        let buttonStack = UIStackView(arrangedSubviews: [distanceLabel, distanceStepper])
+        buttonStack.axis = .vertical
+        buttonStack.alignment = .center
+        buttonStack.distribution = .fillEqually
+        buttonStack.spacing = 10
+        return buttonStack
+    }()
+    
+    lazy var animStylePicker: UIPickerView = {
+        let picker = UIPickerView()
+        return picker
+    }()
+    
+    
     var animationDuration = Double() {
         didSet {
-            animationTimeLabel.text = "AT: \(animationDuration)"
+            animationTimeLabel.text = "Time: \(animationDuration)"
+        }
+    }
+    
+    var travelDistance = CGFloat() {
+        didSet {
+            distanceLabel.text = "Dist: \(travelDistance)"
         }
     }
     
@@ -128,20 +166,16 @@ class ViewController: UIViewController {
     //MARK: -- Methods
     @objc func moveUpButtonPressed(sender: UIButton) {
         let oldYPosition = myViewCenterYConstraint.constant
-        myViewCenterYConstraint.constant = oldYPosition - 125 //Takes the prior constraint constant as a reference point and designates a new point.
-        UIView.animate(withDuration: animationDuration) {
-            self.view.layoutIfNeeded()
-        }
+        myViewCenterYConstraint.constant = oldYPosition - travelDistance
+        //        UIView.animate(withDuration: animationDuration) {
+        //            self.view.layoutIfNeeded()
+        UIView.animate(withDuration: animationDuration, delay: 0, options: [.autoreverse, .repeat], animations: {self.view.layoutIfNeeded()}, completion: nil)
     }
     
-    //        UIView.animate(withDuration: 1.3, delay: 0, options: [.autoreverse,.repeat], animations: {self.view.layoutIfNeeded()}, completion: nil)
-    
-    
-    //'layoutIfNeeded()' animates any constraint changes done for whole view
     
     @objc func moveDownButtonPressed(sender: UIButton) {
         let oldYPosition = myViewCenterYConstraint.constant
-        myViewCenterYConstraint.constant = oldYPosition + 125
+        myViewCenterYConstraint.constant = oldYPosition + travelDistance
         UIView.animate(withDuration: animationDuration) {
             self.view.layoutIfNeeded()
         }
@@ -149,49 +183,51 @@ class ViewController: UIViewController {
     
     @objc func moveLeftButtonPressed(sender: UIButton) {
         let oldXPosition = myViewCenterXConstraint.constant
-        myViewCenterXConstraint.constant = oldXPosition - 125
+        myViewCenterXConstraint.constant = oldXPosition - travelDistance
         UIView.animate(withDuration: animationDuration) {
             self.view.layoutIfNeeded()
         }
     }
     
     @objc func moveRightButtonPressed(sender: UIButton) {
-        
         let oldXPosition = myViewCenterXConstraint.constant
-        
-        myViewCenterXConstraint.constant = oldXPosition + 125
-        
+        myViewCenterXConstraint.constant = oldXPosition + travelDistance
         UIView.animate(withDuration: animationDuration) {
             self.view.layoutIfNeeded()
         }
     }
     
     @objc func animationTimeStepperValueChanged(sender: UIStepper) {
-        
         animationDuration = sender.value
     }
+    
+    @objc func distanceStepperValueChanged(sender: UIStepper) {
+        travelDistance = CGFloat(sender.value)
+    }
+    
+    
     private func addSubViews() {
-        [myView, buttonStackView, animationTimeStackView].forEach{$0.translatesAutoresizingMaskIntoConstraints = false}
+        [myView, buttonStackView, animationTimeStackView, distanceStackView].forEach{$0.translatesAutoresizingMaskIntoConstraints = false}
         
-        let UIElements = [buttonStackView, myView, animationTimeStackView]
+        let UIElements = [myView, buttonStackView, animationTimeStackView, distanceStackView]
         
         for UIElement in UIElements {
             self.view.addSubview(UIElement)
         }
     }
     
-    
     private func setConstraints(){
         setSquareViewConstraints()
         setConstraintsForButtonStack()
         setConstraintsForAnimTimeStack()
+        setConstraintsForDistanceStack()
     }
     
     
     private func setConstraintsForButtonStack() {
         NSLayoutConstraint.activate([
             buttonStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            buttonStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -200),
+            buttonStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -170),
             buttonStackView.heightAnchor.constraint(equalToConstant: 50),
             buttonStackView.widthAnchor.constraint(equalTo: view.widthAnchor),
         ])
@@ -200,10 +236,19 @@ class ViewController: UIViewController {
     
     private func setConstraintsForAnimTimeStack() {
         NSLayoutConstraint.activate([
-            animationTimeStackView.centerXAnchor.constraint(equalTo: buttonStackView.centerXAnchor),
+            animationTimeStackView.centerXAnchor.constraint(equalTo: buttonStackView.centerXAnchor, constant: -70),
             animationTimeStackView.bottomAnchor.constraint(equalTo: buttonStackView.bottomAnchor, constant: 100),
             animationTimeStackView.widthAnchor.constraint(equalToConstant: 130),
             animationTimeStackView.heightAnchor.constraint(equalToConstant: 50)
+        ])
+    }
+    
+    private func setConstraintsForDistanceStack() {
+        NSLayoutConstraint.activate([
+            distanceStackView.centerXAnchor.constraint(equalTo: buttonStackView.centerXAnchor, constant: 70),
+            distanceStackView.bottomAnchor.constraint(equalTo: buttonStackView.bottomAnchor, constant: 100),
+            distanceStackView.widthAnchor.constraint(equalToConstant: 130),
+            distanceStackView.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
     
@@ -216,11 +261,25 @@ class ViewController: UIViewController {
             myViewCenterYConstraint
         ])
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = #colorLiteral(red: 0.9719913602, green: 1, blue: 0.9106864333, alpha: 1)
         addSubViews()
         setConstraints()
+        animationDuration = 1.0
+        travelDistance = 100
     }
 }
 
+//extension ViewController: UIPickerViewDataSource {
+//    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+//        <#code#>
+//    }
+//
+//    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+//        <#code#>
+//    }
+//
+//
+//}
