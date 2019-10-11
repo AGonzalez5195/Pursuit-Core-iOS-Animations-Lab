@@ -68,7 +68,6 @@ class ViewController: UIViewController {
         return buttonStack
     }()
     
-    
     lazy var myView: UIView = {
         let myView = UIView()
         myView.backgroundColor = #colorLiteral(red: 0.9372549057, green: 0.3490196168, blue: 0.1921568662, alpha: 1)
@@ -76,11 +75,37 @@ class ViewController: UIViewController {
         return myView
     }()
     
+    lazy var animationTimeLabel: UILabel = {
+        let label = UILabel()
+        label.text = "AT: \(animationTimeStepper.value)"
+        label.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+        return label
+    }()
+    
     lazy var animationTimeStepper: UIStepper = {
         let stepper = UIStepper()
+        stepper.maximumValue = 5.0
+        stepper.minimumValue = 0.25
         
+        stepper.stepValue = 0.25
+        stepper.addTarget(self, action: #selector(animationTimeStepperValueChanged(sender:)), for: .valueChanged)
         return stepper
     }()
+    
+    lazy var animationTimeStackView: UIStackView = {
+        let buttonStack = UIStackView(arrangedSubviews: [animationTimeLabel, animationTimeStepper])
+        buttonStack.axis = .vertical
+        buttonStack.alignment = .center
+        buttonStack.distribution = .fillEqually
+        buttonStack.spacing = 10
+        return buttonStack
+    }()
+    
+    var animationDuration = Double() {
+        didSet {
+            animationTimeLabel.text = "AT: \(animationDuration)"
+        }
+    }
     
     //References to prior constraints.
     lazy var myViewHeightConstraint: NSLayoutConstraint = {
@@ -102,9 +127,9 @@ class ViewController: UIViewController {
     
     //MARK: -- Methods
     @objc func moveUpButtonPressed(sender: UIButton) {
-        let oldOffset = myViewCenterYConstraint.constant
-        myViewCenterYConstraint.constant = oldOffset - 125 //Takes the prior constraint constant as a reference point and designates a new point.
-        UIView.animate(withDuration: 1.3) {
+        let oldYPosition = myViewCenterYConstraint.constant
+        myViewCenterYConstraint.constant = oldYPosition - 125 //Takes the prior constraint constant as a reference point and designates a new point.
+        UIView.animate(withDuration: animationDuration) {
             self.view.layoutIfNeeded()
         }
     }
@@ -115,33 +140,40 @@ class ViewController: UIViewController {
     //'layoutIfNeeded()' animates any constraint changes done for whole view
     
     @objc func moveDownButtonPressed(sender: UIButton) {
-        let oldOffet = myViewCenterYConstraint.constant
-        myViewCenterYConstraint.constant = oldOffet + 125
-        UIView.animate(withDuration: 1.3) {
+        let oldYPosition = myViewCenterYConstraint.constant
+        myViewCenterYConstraint.constant = oldYPosition + 125
+        UIView.animate(withDuration: animationDuration) {
             self.view.layoutIfNeeded()
         }
     }
     
     @objc func moveLeftButtonPressed(sender: UIButton) {
-        let oldOffet = myViewCenterXConstraint.constant
-        myViewCenterXConstraint.constant = oldOffet - 125
-        UIView.animate(withDuration: 1.3) {
+        let oldXPosition = myViewCenterXConstraint.constant
+        myViewCenterXConstraint.constant = oldXPosition - 125
+        UIView.animate(withDuration: animationDuration) {
             self.view.layoutIfNeeded()
         }
     }
     
     @objc func moveRightButtonPressed(sender: UIButton) {
-        let oldOffet = myViewCenterXConstraint.constant
-        myViewCenterXConstraint.constant = oldOffet + 125
-        UIView.animate(withDuration: 1.3) {
+        
+        let oldXPosition = myViewCenterXConstraint.constant
+        
+        myViewCenterXConstraint.constant = oldXPosition + 125
+        
+        UIView.animate(withDuration: animationDuration) {
             self.view.layoutIfNeeded()
         }
     }
     
-    private func addSubViews() {
-        [myView, buttonStackView].forEach{$0.translatesAutoresizingMaskIntoConstraints = false}
+    @objc func animationTimeStepperValueChanged(sender: UIStepper) {
         
-        let UIElements = [buttonStackView, myView]
+        animationDuration = sender.value
+    }
+    private func addSubViews() {
+        [myView, buttonStackView, animationTimeStackView].forEach{$0.translatesAutoresizingMaskIntoConstraints = false}
+        
+        let UIElements = [buttonStackView, myView, animationTimeStackView]
         
         for UIElement in UIElements {
             self.view.addSubview(UIElement)
@@ -150,24 +182,40 @@ class ViewController: UIViewController {
     
     
     private func setConstraints(){
-        NSLayoutConstraint.activate([
-            myViewWidthConstraint, myViewHeightConstraint, myViewCenterXConstraint, myViewCenterYConstraint
-        ])
-        
-        setConstraintsForStackView()
+        setSquareViewConstraints()
+        setConstraintsForButtonStack()
+        setConstraintsForAnimTimeStack()
     }
     
     
-    private func setConstraintsForStackView() {
+    private func setConstraintsForButtonStack() {
         NSLayoutConstraint.activate([
             buttonStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            buttonStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
+            buttonStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -200),
             buttonStackView.heightAnchor.constraint(equalToConstant: 50),
             buttonStackView.widthAnchor.constraint(equalTo: view.widthAnchor),
         ])
     }
     
     
+    private func setConstraintsForAnimTimeStack() {
+        NSLayoutConstraint.activate([
+            animationTimeStackView.centerXAnchor.constraint(equalTo: buttonStackView.centerXAnchor),
+            animationTimeStackView.bottomAnchor.constraint(equalTo: buttonStackView.bottomAnchor, constant: 100),
+            animationTimeStackView.widthAnchor.constraint(equalToConstant: 130),
+            animationTimeStackView.heightAnchor.constraint(equalToConstant: 50)
+        ])
+    }
+    
+    
+    private func setSquareViewConstraints() {
+        NSLayoutConstraint.activate([
+            myViewWidthConstraint,
+            myViewHeightConstraint,
+            myViewCenterXConstraint,
+            myViewCenterYConstraint
+        ])
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = #colorLiteral(red: 0.9719913602, green: 1, blue: 0.9106864333, alpha: 1)
