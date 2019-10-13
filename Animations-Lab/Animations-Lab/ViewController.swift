@@ -69,10 +69,16 @@ class ViewController: UIViewController {
     }()
     
     lazy var myView: UIView = {
-        let myView = UIView()
-        myView.backgroundColor = #colorLiteral(red: 0.9372549057, green: 0.3490196168, blue: 0.1921568662, alpha: 1)
-        myView.layer.cornerRadius = 50
-        return myView
+        let view = UIView()
+        var frame = view.frame
+        frame.size.width = 150
+        frame.size.height = 150
+        view.frame = frame
+        view.layer.cornerRadius = view.frame.width / 2
+        view.backgroundColor = #colorLiteral(red: 0.9372549057, green: 0.3490196168, blue: 0.1921568662, alpha: 1)
+        
+        
+        return view
     }()
     
     lazy var animationTimeLabel: UILabel = {
@@ -129,9 +135,13 @@ class ViewController: UIViewController {
     
     lazy var animStylePicker: UIPickerView = {
         let picker = UIPickerView()
+        picker.frame = CGRect(x: 0, y: 0, width: self.view.bounds.width, height: 280.0)
+        picker.dataSource = self
+        picker.delegate = self
         return picker
     }()
     
+    var animationStyles = ["CurveLinear", "CurveEaseIn", "CurveEaseOut", "transitionCrossDissolve", "Repeat"]
     
     var animationDuration = Double() {
         didSet {
@@ -147,12 +157,13 @@ class ViewController: UIViewController {
     
     //References to prior constraints.
     lazy var myViewHeightConstraint: NSLayoutConstraint = {
-        myView.heightAnchor.constraint(equalToConstant: 250)
+        myView.heightAnchor.constraint(equalToConstant: myView.frame.height)
     }()
     
     lazy var myViewWidthConstraint: NSLayoutConstraint = {
-        myView.widthAnchor.constraint(equalToConstant: 250)
+        myView.widthAnchor.constraint(equalToConstant: myView.frame.width)
     }()
+    //The frame is a circle, but the view isn't yet 'cut out' for the frame until these two lines
     
     lazy var myViewCenterXConstraint: NSLayoutConstraint = {
         myView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
@@ -162,39 +173,32 @@ class ViewController: UIViewController {
         myView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
     }()
     
+    var animationStyle = UIView.AnimationOptions.curveEaseOut
     
     //MARK: -- Methods
     @objc func moveUpButtonPressed(sender: UIButton) {
         let oldYPosition = myViewCenterYConstraint.constant
         myViewCenterYConstraint.constant = oldYPosition - travelDistance
-        //        UIView.animate(withDuration: animationDuration) {
-        //            self.view.layoutIfNeeded()
-        UIView.animate(withDuration: animationDuration, delay: 0, options: [.autoreverse, .repeat], animations: {self.view.layoutIfNeeded()}, completion: nil)
+        UIView.animate(withDuration: animationDuration, delay: 0, options: animationStyle, animations: {self.view.layoutIfNeeded()}, completion: nil)
     }
     
     
     @objc func moveDownButtonPressed(sender: UIButton) {
         let oldYPosition = myViewCenterYConstraint.constant
         myViewCenterYConstraint.constant = oldYPosition + travelDistance
-        UIView.animate(withDuration: animationDuration) {
-            self.view.layoutIfNeeded()
-        }
+        UIView.animate(withDuration: animationDuration, delay: 0, options: animationStyle, animations: {self.view.layoutIfNeeded()}, completion: nil)
     }
     
     @objc func moveLeftButtonPressed(sender: UIButton) {
         let oldXPosition = myViewCenterXConstraint.constant
         myViewCenterXConstraint.constant = oldXPosition - travelDistance
-        UIView.animate(withDuration: animationDuration) {
-            self.view.layoutIfNeeded()
-        }
+        UIView.animate(withDuration: animationDuration, delay: 0, options: animationStyle, animations: {self.view.layoutIfNeeded()}, completion: nil)
     }
     
     @objc func moveRightButtonPressed(sender: UIButton) {
         let oldXPosition = myViewCenterXConstraint.constant
         myViewCenterXConstraint.constant = oldXPosition + travelDistance
-        UIView.animate(withDuration: animationDuration) {
-            self.view.layoutIfNeeded()
-        }
+        UIView.animate(withDuration: animationDuration, delay: 0, options: animationStyle, animations: {self.view.layoutIfNeeded()}, completion: nil)
     }
     
     @objc func animationTimeStepperValueChanged(sender: UIStepper) {
@@ -207,9 +211,9 @@ class ViewController: UIViewController {
     
     
     private func addSubViews() {
-        [myView, buttonStackView, animationTimeStackView, distanceStackView].forEach{$0.translatesAutoresizingMaskIntoConstraints = false}
+        [myView, buttonStackView, animationTimeStackView, distanceStackView, animStylePicker].forEach{$0.translatesAutoresizingMaskIntoConstraints = false}
         
-        let UIElements = [myView, buttonStackView, animationTimeStackView, distanceStackView]
+        let UIElements = [myView, buttonStackView, animationTimeStackView, distanceStackView, animStylePicker]
         
         for UIElement in UIElements {
             self.view.addSubview(UIElement)
@@ -217,10 +221,11 @@ class ViewController: UIViewController {
     }
     
     private func setConstraints(){
-        setSquareViewConstraints()
+        setViewConstraints()
         setConstraintsForButtonStack()
         setConstraintsForAnimTimeStack()
         setConstraintsForDistanceStack()
+        setconstraintsForAnimPicker()
     }
     
     
@@ -252,8 +257,16 @@ class ViewController: UIViewController {
         ])
     }
     
+    private func setconstraintsForAnimPicker() {
+        NSLayoutConstraint.activate([
+            animStylePicker.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: -3.5),
+            animStylePicker.bottomAnchor.constraint(equalTo: buttonStackView.topAnchor, constant: -450)
+            
+        ])
+    }
     
-    private func setSquareViewConstraints() {
+    
+    private func setViewConstraints() {
         NSLayoutConstraint.activate([
             myViewWidthConstraint,
             myViewHeightConstraint,
@@ -272,14 +285,31 @@ class ViewController: UIViewController {
     }
 }
 
-//extension ViewController: UIPickerViewDataSource {
-//    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-//        <#code#>
-//    }
-//
-//    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-//        <#code#>
-//    }
-//
-//
-//}
+extension ViewController: UIPickerViewDataSource, UIPickerViewDelegate {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return animationStyles.count
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return animationStyles[row]
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        switch row {
+        case 0: animationStyle = .curveLinear
+        case 1: animationStyle = .curveEaseIn
+        case 2: animationStyle = .curveEaseOut
+        case 3: animationStyle = .transitionCrossDissolve
+        case 4: animationStyle = .repeat
+        default:
+            animationStyle = .init()
+        }
+        print(animationStyle)
+    }
+    
+    
+}
