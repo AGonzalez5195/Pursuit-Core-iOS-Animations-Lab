@@ -84,7 +84,7 @@ class ViewController: UIViewController {
     lazy var animationTimeLabel: UILabel = {
         let label = UILabel()
         label.text = "Time: \(animationTimeStepper.value)"
-        label.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+        label.textColor = #colorLiteral(red: 0.4392156899, green: 0.01176470611, blue: 0.1921568662, alpha: 1)
         return label
     }()
     
@@ -110,7 +110,7 @@ class ViewController: UIViewController {
     lazy var distanceLabel: UILabel = {
         let label = UILabel()
         label.text = "Dist: \(distanceStepper.value)"
-        label.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+        label.textColor = #colorLiteral(red: 0.4392156899, green: 0.01176470611, blue: 0.1921568662, alpha: 1)
         return label
     }()
     
@@ -181,7 +181,7 @@ class ViewController: UIViewController {
     
     //MARK: -- Methods
     @objc func moveUpButtonPressed(sender: UIButton) {
-        myView.image = #imageLiteral(resourceName: "test")
+        myView.image = #imageLiteral(resourceName: "imageMoving")
         let oldYPosition = myViewCenterYConstraint.constant
         myViewCenterYConstraint.constant = oldYPosition - travelDistance
         UIView.animate(withDuration: animationDuration, delay: 0, options: selectedAnimationOption, animations: {self.view.layoutIfNeeded()}, completion: {(action) in
@@ -191,7 +191,7 @@ class ViewController: UIViewController {
     
     
     @objc func moveDownButtonPressed(sender: UIButton) {
-        myView.image = #imageLiteral(resourceName: "test")
+        myView.image = #imageLiteral(resourceName: "imageMoving")
         let oldYPosition = myViewCenterYConstraint.constant
         myViewCenterYConstraint.constant = oldYPosition + travelDistance
         UIView.animate(withDuration: animationDuration, delay: 0, options: selectedAnimationOption, animations: {self.view.layoutIfNeeded()}, completion: {(action) in
@@ -200,7 +200,7 @@ class ViewController: UIViewController {
     }
     
     @objc func moveLeftButtonPressed(sender: UIButton) {
-        myView.image = #imageLiteral(resourceName: "test")
+        myView.image = #imageLiteral(resourceName: "imageMoving")
         let oldXPosition = myViewCenterXConstraint.constant
         myViewCenterXConstraint.constant = oldXPosition - travelDistance
         UIView.animate(withDuration: animationDuration, delay: 0, options: selectedAnimationOption, animations: {self.view.layoutIfNeeded()}, completion: {(action) in
@@ -209,7 +209,7 @@ class ViewController: UIViewController {
     }
     
     @objc func moveRightButtonPressed(sender: UIButton) {
-        myView.image = #imageLiteral(resourceName: "test")
+        myView.image = #imageLiteral(resourceName: "imageMoving")
         let oldXPosition = myViewCenterXConstraint.constant
         myViewCenterXConstraint.constant = oldXPosition + travelDistance
         UIView.animate(withDuration: animationDuration, delay: 0, options: selectedAnimationOption, animations: {self.view.layoutIfNeeded()}, completion: {(action) in
@@ -302,7 +302,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = #colorLiteral(red: 0.9719913602, green: 1, blue: 0.9106864333, alpha: 1)
+        self.view.backgroundColor = #colorLiteral(red: 0.9632374644, green: 1, blue: 0.8970387578, alpha: 1)
         addSubViews()
         setConstraints()
         animationDuration = 1.0
