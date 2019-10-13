@@ -135,19 +135,14 @@ class ViewController: UIViewController {
     
     lazy var animStylePicker: UIPickerView = {
         let picker = UIPickerView()
-        picker.frame = CGRect(x: 0, y: 0, width: self.view.bounds.width, height: 280.0)
         picker.dataSource = self
         picker.delegate = self
         return picker
     }()
     
-    
-    
     var selectedAnimationOption = UIView.AnimationOptions()
     
-    var animationOptionTitles = ["CurveLinear", "CurveEaseIn", "CurveEaseOut", "transitionCrossDissolve", "Repeat"]
-    
-    
+
     var animationDuration = Double() {
         didSet {
             animationTimeLabel.text = "Time: \(animationDuration)"
@@ -287,7 +282,8 @@ class ViewController: UIViewController {
     private func setconstraintsForAnimPicker() {
         NSLayoutConstraint.activate([
             animStylePicker.centerXAnchor.constraint(equalTo:  view.centerXAnchor, constant: -3.5),
-            animStylePicker.bottomAnchor.constraint(equalTo: view.centerYAnchor, constant: -100)
+            animStylePicker.bottomAnchor.constraint(equalTo: view.centerYAnchor, constant: -100),
+            animStylePicker.heightAnchor.constraint(equalToConstant: 110)
         ])
     }
     
@@ -317,10 +313,12 @@ extension ViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        let animationOptionTitles = ["CurveLinear", "CurveEaseIn", "CurveEaseOut", "transitionCrossDissolve", "Repeat"]
         return animationOptionTitles.count
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        let animationOptionTitles = ["CurveLinear", "CurveEaseIn", "CurveEaseOut", "transitionCrossDissolve", "Repeat"]
         return animationOptionTitles[row]
     }
     
