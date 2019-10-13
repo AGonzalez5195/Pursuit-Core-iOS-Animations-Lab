@@ -68,14 +68,15 @@ class ViewController: UIViewController {
         return buttonStack
     }()
     
-    lazy var myView: UIView = {
-        let view = UIView()
+    lazy var myView: UIImageView = {
+        let view = UIImageView()
+        view.image = UIImage(named: "image")
         var frame = view.frame
         frame.size.width = 150
         frame.size.height = 150
         view.frame = frame
         view.layer.cornerRadius = view.frame.width / 2
-        view.backgroundColor = #colorLiteral(red: 0.9372549057, green: 0.3490196168, blue: 0.1921568662, alpha: 1)
+        view.backgroundColor = .clear
         
         
         return view
@@ -140,8 +141,10 @@ class ViewController: UIViewController {
         picker.delegate = self
         return picker
     }()
+    var animationStyle = UIView.AnimationOptions.curveLinear
     
     var animationStyles = ["CurveLinear", "CurveEaseIn", "CurveEaseOut", "transitionCrossDissolve", "Repeat"]
+    
     
     var animationDuration = Double() {
         didSet {
@@ -173,7 +176,7 @@ class ViewController: UIViewController {
         myView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
     }()
     
-    var animationStyle = UIView.AnimationOptions.curveEaseOut
+    
     
     //MARK: -- Methods
     @objc func moveUpButtonPressed(sender: UIButton) {
@@ -220,6 +223,7 @@ class ViewController: UIViewController {
         }
     }
     
+    //MARK: -- Constraints
     private func setConstraints(){
         setViewConstraints()
         setConstraintsForButtonStack()
@@ -285,6 +289,7 @@ class ViewController: UIViewController {
     }
 }
 
+//MARK: -- PickerView DataSource/Delegate
 extension ViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         1
