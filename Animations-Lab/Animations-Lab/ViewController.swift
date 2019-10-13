@@ -71,15 +71,13 @@ class ViewController: UIViewController {
     
     lazy var myView: UIImageView = {
         let view = UIImageView()
-        view.image = UIImage(named: "image")
+        view.image = #imageLiteral(resourceName: "image")
         var frame = view.frame
         frame.size.width = 150
         frame.size.height = 150
         view.frame = frame
         view.layer.cornerRadius = view.frame.width / 2
         view.backgroundColor = .clear
-        
-        
         return view
     }()
     
@@ -179,32 +177,44 @@ class ViewController: UIViewController {
     lazy var myViewCenterYConstraint: NSLayoutConstraint = {
         myView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
     }()
-
+    
     
     //MARK: -- Methods
     @objc func moveUpButtonPressed(sender: UIButton) {
+        myView.image = #imageLiteral(resourceName: "test")
         let oldYPosition = myViewCenterYConstraint.constant
         myViewCenterYConstraint.constant = oldYPosition - travelDistance
-        UIView.animate(withDuration: animationDuration, delay: 0, options: selectedAnimationOption, animations: {self.view.layoutIfNeeded()}, completion: nil)
+        UIView.animate(withDuration: animationDuration, delay: 0, options: selectedAnimationOption, animations: {self.view.layoutIfNeeded()}, completion: {(action) in
+            self.myView.image = #imageLiteral(resourceName: "image")
+        })
     }
     
     
     @objc func moveDownButtonPressed(sender: UIButton) {
+        myView.image = #imageLiteral(resourceName: "test")
         let oldYPosition = myViewCenterYConstraint.constant
         myViewCenterYConstraint.constant = oldYPosition + travelDistance
-        UIView.animate(withDuration: animationDuration, delay: 0, options: selectedAnimationOption, animations: {self.view.layoutIfNeeded()}, completion: nil)
+        UIView.animate(withDuration: animationDuration, delay: 0, options: selectedAnimationOption, animations: {self.view.layoutIfNeeded()}, completion: {(action) in
+            self.myView.image = #imageLiteral(resourceName: "image")
+        })
     }
     
     @objc func moveLeftButtonPressed(sender: UIButton) {
+        myView.image = #imageLiteral(resourceName: "test")
         let oldXPosition = myViewCenterXConstraint.constant
         myViewCenterXConstraint.constant = oldXPosition - travelDistance
-        UIView.animate(withDuration: animationDuration, delay: 0, options: selectedAnimationOption, animations: {self.view.layoutIfNeeded()}, completion: nil)
+        UIView.animate(withDuration: animationDuration, delay: 0, options: selectedAnimationOption, animations: {self.view.layoutIfNeeded()}, completion: {(action) in
+            self.myView.image = #imageLiteral(resourceName: "image")
+        })
     }
     
     @objc func moveRightButtonPressed(sender: UIButton) {
+        myView.image = #imageLiteral(resourceName: "test")
         let oldXPosition = myViewCenterXConstraint.constant
         myViewCenterXConstraint.constant = oldXPosition + travelDistance
-        UIView.animate(withDuration: animationDuration, delay: 0, options: selectedAnimationOption, animations: {self.view.layoutIfNeeded()}, completion: nil)
+        UIView.animate(withDuration: animationDuration, delay: 0, options: selectedAnimationOption, animations: {self.view.layoutIfNeeded()}, completion: {(action) in
+            self.myView.image = #imageLiteral(resourceName: "image")
+        })
     }
     
     @objc func animationTimeStepperValueChanged(sender: UIStepper) {
@@ -252,7 +262,7 @@ class ViewController: UIViewController {
             upDownButtonStack.heightAnchor.constraint(equalToConstant: 100),
             upDownButtonStack.widthAnchor.constraint(equalToConstant: 50)
             
-        
+            
         ])
     }
     
